@@ -20,7 +20,10 @@ jobs:
           java-version: "17"
           cache: gradle
       - name: Run backend tests
-        run: ./gradlew test
+        run: |
+          sed -i 's/\r$//' gradlew
+          chmod +x gradlew
+          ./gradlew test
 
   frontend:
     runs-on: ubuntu-latest
