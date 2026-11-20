@@ -237,7 +237,7 @@ Content-Type: application/json
 
 일정 화면의 **Google Calendar 연동** 버튼을 한 번 승인하면, 이후 해당 사용자가 접근할 수 있는 공유 보드 일정의 생성·수정·삭제가 기본 Google Calendar에 자동 반영됩니다. 공유 멤버별 Google Calendar에 표시하려면 각 멤버가 자신의 계정으로 연동해야 합니다.
 
-생리 주기 기록도 함께 반영됩니다. 실제 생리 기간(🌸), 앱이 계산한 생리 예정(🌸 예정, 앞으로 6주기), 가임기(🌱), 배란 예정(🌼)이 알림 없는 비공개(`private`)·한가함(`transparent`) 종일 일정으로 올라갑니다. 기록을 추가·수정·삭제하면 해당 사용자의 생리 주기 일정 전체를 다시 계산해 바뀐 구간만 지우고 새로 만듭니다(`cycle_google_event`). 예측 규칙은 프론트엔드 `cycleCalendar.ts`와 백엔드 `CycleCalendarPlanner`가 같아야 합니다.
+생리 주기 기록도 공유 보드 구성원 중 Google Calendar를 연동한 모든 사용자의 캘린더에 함께 반영됩니다. 기록 작성자가 Google을 연동하지 않았어도 다른 연동 사용자의 캘린더에는 표시됩니다. 실제 생리 기간(🌸), 앱이 계산한 생리 예정(🌸 예정, 앞으로 6주기), 가임기(🌱), 배란 예정(🌼)이 `닉네임 + 이모지` 형식의 알림 없는 비공개(`private`)·한가함(`transparent`) 종일 일정으로 올라갑니다. 기록을 추가·수정·삭제하면 영향받는 사용자들의 생리 주기 일정 전체를 다시 계산해 바뀐 구간만 지우고 새로 만듭니다(`cycle_google_event`). 예측 규칙은 프론트엔드 `cycleCalendar.ts`와 백엔드 `CycleCalendarPlanner`가 같아야 합니다.
 
 1. Google Cloud Console에서 **Google Calendar API**를 사용 설정합니다.
 2. **Google Auth Platform → 데이터 액세스 → 범위 추가 또는 삭제**에서 아래 범위를 추가합니다.

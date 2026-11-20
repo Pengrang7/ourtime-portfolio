@@ -104,25 +104,85 @@ public interface GoogleCalendarConnectionMapper {
     void deleteEvent(@Param("scheduleId") long scheduleId, @Param("userId") long userId);
 
     @Select("""
-            SELECT event_key, google_event_id, content_hash
+            SELECT source_user_id, event_key, google_event_id, content_hash
             FROM cycle_google_event
             WHERE user_id = #{userId}
-            ORDER BY event_key
+            ORDER BY source_user_id, event_key
             """)
     List<CycleGoogleEvent> findCycleEvents(long userId);
 
     @Insert("""
-            INSERT INTO cycle_google_event (user_id, event_key, google_event_id, content_hash)
-            VALUES (#{userId}, #{eventKey}, #{eventId}, #{contentHash})
+            INSERT INTO cycle_google_event (user_id, source_user_id, event_key, google_event_id, content_hash)
+            VALUES (#{userId}, #{sourceUserId}, #{eventKey}, #{eventId}, #{contentHash})
             ON DUPLICATE KEY UPDATE google_event_id = VALUES(google_event_id), content_hash = VALUES(content_hash),
                 synced_at = CURRENT_TIMESTAMP(6)
             """)
-    void upsertCycleEvent(@Param("userId") long userId, @Param("eventKey") String eventKey,
+    void upsertCycleEvent(@Param("userId") long userId, @Param("sourceUserId") long sourceUserId,
+                          @Param("eventKey") String eventKey,
                           @Param("eventId") String eventId, @Param("contentHash") String contentHash);
 
     @Delete("""
             DELETE FROM cycle_google_event
-            WHERE user_id = #{userId} AND event_key = #{eventKey}
+            WHERE user_id = #{userId} AND source_user_id = #{sourceUserId} AND event_key = #{eventKey}
             """)
-    void deleteCycleEvent(@Param("userId") long userId, @Param("eventKey") String eventKey);
+    void deleteCycleEvent(@Param("userId") long userId, @Param("sourceUserId") long sourceUserId,
+                          @Param("eventKey") String eventKey);
+
+    @Select("""
+            WITH source_boards AS (
+                SELECT board_id
+                FROM board
+                WHERE owner_id = #{sourceUserId} AND use_yn = 'Y'
+                UNION
+                SELECT bm.board_id
+                FROM board_member bm
+                JOIN board b ON b.board_id = bm.board_id AND b.use_yn = 'Y'
+                WHERE bm.user_id = #{sourceUserId} AND bm.use_yn = 'Y'
+            ), shared_users AS (
+                SELECT #{sourceUserId} AS user_id
+                UNION
+                SELECT b.owner_id
+                FROM board b
+                JOIN source_boards sb ON sb.board_id = b.board_id
+                UNION
+                SELECT bm.user_id
+                FROM board_member bm
+                JOIN source_boards sb ON sb.board_id = bm.board_id
+                WHERE bm.use_yn = 'Y'
+            )
+            SELECT DISTINCT su.user_id
+            FROM shared_users su
+            JOIN google_calendar_connection gcc ON gcc.user_id = su.user_id AND gcc.use_yn = 'Y'
+            ORDER BY su.user_id
+            """)
+    List<Long> findCycleTargetUserIds(long sourceUserId);
+
+    @Select("""
+            WITH target_boards AS (
+                SELECT board_id
+                FROM board
+                WHERE owner_id = #{targetUserId} AND use_yn = 'Y'
+                UNION
+                SELECT bm.board_id
+                FROM board_member bm
+                JOIN board b ON b.board_id = bm.board_id AND b.use_yn = 'Y'
+                WHERE bm.user_id = #{targetUserId} AND bm.use_yn = 'Y'
+            ), shared_users AS (
+                SELECT #{targetUserId} AS user_id
+                UNION
+                SELECT b.owner_id
+                FROM board b
+                JOIN target_boards tb ON tb.board_id = b.board_id
+                UNION
+                SELECT bm.user_id
+                FROM board_member bm
+                JOIN target_boards tb ON tb.board_id = bm.board_id
+                WHERE bm.use_yn = 'Y'
+            )
+            SELECT DISTINCT u.user_id, COALESCE(NULLIF(u.nickname, ''), '멤버') AS nickname
+            FROM shared_users su
+            JOIN app_user u ON u.user_id = su.user_id AND u.use_yn = 'Y'
+            ORDER BY u.user_id
+            """)
+    List<CycleGoogleSource> findCycleSources(long targetUserId);
 }

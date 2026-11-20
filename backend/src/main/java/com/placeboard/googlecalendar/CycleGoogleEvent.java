@@ -1,4 +1,4 @@
 package com.placeboard.googlecalendar;
 
-public record CycleGoogleEvent(String eventKey, String googleEventId, String contentHash) {
+public record CycleGoogleEvent(long sourceUserId, String eventKey, String googleEventId, String contentHash) {
 }
