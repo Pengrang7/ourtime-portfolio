@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: place-board
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+  servlet:
+    session:
+      timeout: 14d
+      cookie:
+        http-only: true
+        same-site: lax
+
+placeboard:
+  auth:
+    # Google Cloud Console에서 발급한 OAuth 웹 클라이언트 ID (비밀값 아님, 환경변수로 주입)
+    google-client-id: ${GOOGLE_CLIENT_ID:}
+    # true면 로그인 없이 X-User-Email 헤더(없으면 owner@local.place)로 접속한다. 로컬 개발용.
+    header-login-enabled: ${PLACEBOARD_HEADER_LOGIN:false}
+  google-calendar:
+    # OAuth Client Secret과 토큰 암호화 키는 Secret Manager를 통해 주입한다.
+    client-secret: ${GOOGLE_CLIENT_SECRET:}
+    redirect-uri: ${GOOGLE_CALENDAR_REDIRECT_URI:}
+    token-encryption-key: ${GOOGLE_TOKEN_ENCRYPTION_KEY:}
+  keepalive:
+    # Cloud Run 인스턴스 내부에서 실행되는 DB keepalive 주기(50분) 및 초기 지연(1분).
+    interval-ms: 3000000
+    initial-delay-ms: 60000
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true

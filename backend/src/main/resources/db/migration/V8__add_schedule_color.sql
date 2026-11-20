@@ -1,0 +1,2 @@
+ALTER TABLE board_schedule
+    ADD COLUMN color VARCHAR(7) NOT NULL DEFAULT '#168A4A' AFTER memo;

@@ -1,0 +1,2 @@
+ALTER TABLE board_schedule
+    ADD COLUMN all_day BOOLEAN NOT NULL DEFAULT FALSE AFTER end_at;

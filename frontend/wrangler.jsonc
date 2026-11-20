@@ -1,0 +1,15 @@
+{
+  "name": "place-board",
+  "compatibility_date": "2026-09-29",
+  "main": "./worker/index.ts",
+  "vars": {
+    "API_ORIGIN": "https://YOUR_BACKEND_DOMAIN",
+    "MIGRATION_MAINTENANCE": "false"
+  },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  }
+}

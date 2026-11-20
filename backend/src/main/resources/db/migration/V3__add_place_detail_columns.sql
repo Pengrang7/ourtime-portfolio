@@ -1,0 +1,3 @@
+ALTER TABLE place
+    ADD COLUMN category VARCHAR(200) NULL AFTER dong,
+    ADD COLUMN phone VARCHAR(50) NULL AFTER category;

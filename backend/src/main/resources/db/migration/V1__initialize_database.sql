@@ -1,0 +1,6 @@
+CREATE TABLE app_metadata (
+    metadata_key VARCHAR(100) NOT NULL,
+    metadata_value VARCHAR(500) NOT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (metadata_key)
+);
